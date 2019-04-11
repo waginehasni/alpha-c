@@ -1,0 +1,75 @@
+#include<SDL/SDL.h>
+#include<SDL/SDL_image.h>
+
+typedef struct perso
+{
+	SDL_Surface *enemied[4];
+	SDL_Rect posenemie1;
+	int direction; 
+}perso;
+
+
+void deplacer_ennemi (perso *ennemi, int min, int max)
+{
+	 
+	if (ennemi->posenemie1.x >= max )
+		ennemi->direction = 0;
+		
+	if ( ennemi->posenemie1.x <= min )
+		ennemi->direction = 1;
+		
+	if ( ennemi->direction == 1)
+		ennemi->pos.x += 5;
+	if (ennemi->direction == 0)
+		ennemi->pos.x -= 5;
+			
+}
+
+void afficher_ennemi (Perso *ennemi, SDL_Surface *ecran)
+{
+	SDL_Delay(20);
+	SDL_BlitSurface (ennemi->enemied[0], NULL, ecran, &ennemi->pos);
+}
+
+
+int main(void)
+{
+	SDL_Surface *screen = NULL, *image=NULL;
+	Perso ennemi;
+	SDL_Rect positionecran;
+	SDL_Event event;
+	int min=0, max = 200;	
+	
+	SDL_Init (SDL_INIT_VIDEO);
+	screen = SDL_SetVideoMode (900,600,32,SDL_HWSURFACE | SDL_DOUBLEBUF);
+	image=IMG_Load ("teswira.jpg");
+	ennemi.enemied[0] = IMG_Load("detective.png");
+	if(ennemi.enemied[0]==NULL)
+		exit(EXIT_FAILURE);
+	
+	
+	positionecran.x=0;
+	positionecran.y=0;
+	
+	ennemi.posenemie1.x=120;
+	ennemi.posenemie1.y=270;
+	ennemi.direction = 1;
+	
+	while (event.type != SDL_QUIT)
+	{	SDL_PollEvent(&event);
+		
+		//affichage
+		SDL_BlitSurface (image, NULL, ecran, &posBack);
+		deplacer_ennemi (&ennemi, min, max);	
+		afficher_ennemi (&ennemi, ecran);
+		SDL_Flip(ecran);
+		
+		//gestion des evenements...
+		
+	}	
+		
+SDL_FreeSurface(ennemi.enemied[0]);
+SDL_FreeSurface(image);
+SDL_FreeSurface(screen);		
+SDL_Quit();
+}
