@@ -91,11 +91,23 @@ void option(SDL_Surface* ecran,Mix_Chunk *effet,Mix_Chunk *effet2,Mix_Music *mus
         case SDL_KEYDOWN:
             switch (event.key.keysym.sym)
             {
-            case SDLK_ESCAPE:
+            case SDLK_q:
                 (*continuer) = 0;
                 break;
-	    case SDLK_p:
-		(*continuer)=0;
+            case SDLK_KP3:
+                  if ((*mute)==0)
+           	{
+           		Mix_PlayChannel( -1, effet2, 0 ) ;
+           	}
+                boucle=0;
+               break;
+	    case SDLK_KP2:
+	        if ((*mute)==0)
+           	{
+           		Mix_PlayChannel( -1, effet2, 0 ) ;
+           	}
+            	sound(ecran,effet,effet2,&musique,mute,continuer,&boucle,posvolb);
+            	break;
             }
         case SDL_MOUSEBUTTONUP:
 

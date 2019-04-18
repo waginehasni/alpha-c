@@ -6,4 +6,4 @@
 #include <SDL/SDL_ttf.h>
 #include <time.h>
 
-void enigme (SDL_Surface **ecran,int **continuer,Mix_Music **intro,Mix_Chunk **effet,Mix_Chunk **effet2,Mix_Music **musique,int **mute,SDL_Rect **posvolb, int *menu,Mix_Chunk **dying);
+void enigme (SDL_Surface **ecran,int **continuer,Mix_Music **intro,Mix_Chunk **effet,Mix_Chunk **effet2,Mix_Music **musique,int **mute,SDL_Rect **posvolb,Mix_Chunk **dying, int *victory);

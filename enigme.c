@@ -5,10 +5,10 @@
 #define speed 6
 #include <string.h>
 
-void enigme (SDL_Surface **ecran,int **continuer,Mix_Music **intro,Mix_Chunk **effet,Mix_Chunk **effet2,Mix_Music **musique,int **mute,SDL_Rect **posvolb, int *menu,Mix_Chunk **dying)
+void enigme (SDL_Surface **ecran,int **continuer,Mix_Music **intro,Mix_Chunk **effet,Mix_Chunk **effet2,Mix_Music **musique,int **mute,SDL_Rect **posvolb,Mix_Chunk **dying,int *victory)
 {
-	SDL_Surface *fond=NULL,*gameover=NULL,*heroactu=NULL,*hurt=NULL,*idlel=NULL,*idler=NULL,*sol1=NULL,*sol2=NULL,*sol3=NULL,*herod=NULL,*herog=NULL,*platforme1=NULL,*platforme2=NULL,*platforme3=NULL,*bulle1=NULL,*bulle2=NULL,*enigme=NULL,*platforme=NULL,*platformenormal=NULL,*platformepiege=NULL;
-	SDL_Rect posfond,poshero,posgameover,posenigme,framed[8],frame2[8],possol1,possol2,possol3,posplatforme,posbulle,posplatforme1,posvictory,posplatforme2,posplatforme3,posplatformen1,posplatformen2,posplatformen3,posplatformep1,posplatformep2,posplatformep3;
+	SDL_Surface *fond=NULL,*gameover=NULL,*solution=NULL,*heroactu=NULL,*hurt=NULL,*idlel=NULL,*idler=NULL,*sol1=NULL,*sol2=NULL,*sol3=NULL,*herod=NULL,*herog=NULL,*platforme1=NULL,*platforme2=NULL,*platforme3=NULL,*bulle1=NULL,*bulle2=NULL,*enigme=NULL,*platforme=NULL,*platformenormal=NULL,*platformepiege=NULL;
+	SDL_Rect posfond,poshero,possolution,posgameover,posenigme,framed[8],frame2[8],possol1,possol2,possol3,posplatforme,posbulle,posplatforme1,posvictory,posplatforme2,posplatforme3,posplatformen1,posplatformen2,posplatformen3,posplatformep1,posplatformep2,posplatformep3;
 	poshero.x=1200;
 	poshero.y=460;
 	posfond.x=0;
@@ -47,6 +47,8 @@ void enigme (SDL_Surface **ecran,int **continuer,Mix_Music **intro,Mix_Chunk **e
 	posenigme.y=0;
 	posbulle.x=800;
 	posbulle.y=250;
+	possolution.x=800;
+	possolution.y=250;
 	
 	posplatformep1.x=50;
 	posplatformep1.y=543;
@@ -63,8 +65,9 @@ void enigme (SDL_Surface **ecran,int **continuer,Mix_Music **intro,Mix_Chunk **e
 	posplatformep3.w=251;
 	posplatformep3.h=145;
 	
- 	int boucle=1,a=0,posans=460,nb=0,x=0,y=0,e=2,j=0,i=0,CAR3=0,CAR2=0,CAR1=0,victory=0;
+ 	int boucle=1,a=0,posans=460,nb=0,x=0,y=0,e=2,j=0,i=0,CAR3=0,CAR2=0,CAR1=0;
 	SDL_Event event;
+	solution=IMG_Load("image/enigme/solution.png");
 	sol1=IMG_Load("image/decoration/sol1.png");
 	sol2=IMG_Load("image/decoration/sol2.png");
 	sol3=IMG_Load("image/decoration/sol3.png");
@@ -78,7 +81,7 @@ void enigme (SDL_Surface **ecran,int **continuer,Mix_Music **intro,Mix_Chunk **e
 	idlel=IMG_Load("image/perso/idlel.png");
  	herod=IMG_Load("image/perso/wr1.png");
  	herog=IMG_Load("image/perso/wl1.png");
-    	heroactu=herog;
+    	heroactu=idlel;
     	for (i=0; i<8;i++)
 	{
 		if (j==4)
@@ -122,7 +125,7 @@ void enigme (SDL_Surface **ecran,int **continuer,Mix_Music **intro,Mix_Chunk **e
  	SDL_BlitSurface(heroactu, &framed[0], *ecran, &poshero);
  	SDL_Flip(*ecran);
  	//Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024);
- 	//SDL_Delay(4000);
+ 	SDL_Delay(4000);
  	Uint8 *keystates = SDL_GetKeyState( NULL );
  	fonts = TTF_OpenFont("fonts/Takota.ttf", 70);
 	posplatforme1=posplatformen1;
@@ -131,8 +134,10 @@ void enigme (SDL_Surface **ecran,int **continuer,Mix_Music **intro,Mix_Chunk **e
 	platforme1=platformenormal;
 	platforme3=platformenormal;
 	platforme2=platformenormal;
+	int tempsActuel = 0;
 	while ((boucle)&&((*continuer)))
 	{
+		tempsActuel = SDL_GetTicks();
 		while (SDL_PollEvent(&event))
        		switch(event.type)
        		{
@@ -154,7 +159,8 @@ void enigme (SDL_Surface **ecran,int **continuer,Mix_Music **intro,Mix_Chunk **e
             		break;
             		case SDLK_j:
             		if (collision(poshero,posplatformen1)==1)
-            		{	
+            		{
+				*victory=0;	
             			Mix_PlayChannel( -1, *dying, 0 ) ;
             			platforme1=platformepiege;
             			posplatforme1=posplatformep1;
@@ -175,7 +181,7 @@ void enigme (SDL_Surface **ecran,int **continuer,Mix_Music **intro,Mix_Chunk **e
  					SDL_BlitSurface(heroactu,&frame2[j/6], *ecran, &poshero);
  					SDL_Flip(*ecran);
             			}
-            			gameover=TTF_RenderText_Blended(fonts, "GAME OVER", couleur);
+            			gameover=TTF_RenderText_Blended(fonts, "WRONG ANSWER", couleur);
             			SDL_BlitSurface(fond, NULL, *ecran, &posfond);
  				SDL_BlitSurface(sol1, NULL, *ecran, &possol1);
  				SDL_BlitSurface(sol2, NULL, *ecran, &possol2);
@@ -188,7 +194,6 @@ void enigme (SDL_Surface **ecran,int **continuer,Mix_Music **intro,Mix_Chunk **e
  				SDL_Flip(*ecran);
  				SDL_Delay(4000);
  				boucle=0;
- 				(*menu)=1;
             			
             		}
             		
@@ -196,13 +201,18 @@ void enigme (SDL_Surface **ecran,int **continuer,Mix_Music **intro,Mix_Chunk **e
             		{	
             		
             			gameover=TTF_RenderText_Blended(fonts, "GOOD JOB!", couleur);
-            			victory=1;
+            			*victory=1;
+                                        SDL_BlitSurface(fond, NULL, *ecran, &posfond);
+ 				        SDL_BlitSurface(gameover,NULL, *ecran, &posgameover);
+ 				        SDL_Flip(*ecran);
+ 				        SDL_Delay(4000);
+
             			boucle=0;
-            			(*menu)=1;
             		}
             		
             		if (collision(poshero,posplatformen3)==1)
-            		{
+            		{       
+            		        *victory=0;
             			Mix_PlayChannel( -1, *dying, 0 ) ;
             			platforme3=platformepiege;
             			posplatforme3=posplatformep3;
@@ -222,7 +232,7 @@ void enigme (SDL_Surface **ecran,int **continuer,Mix_Music **intro,Mix_Chunk **e
  					SDL_BlitSurface(heroactu,&frame2[j/6], *ecran, &poshero);
  					SDL_Flip(*ecran);
             			}
-            			gameover=TTF_RenderText_Blended(fonts, "GAME OVER", couleur);
+            			gameover=TTF_RenderText_Blended(fonts, "WRONG ANSWER", couleur);
             			SDL_BlitSurface(fond, NULL, *ecran, &posfond);
  				SDL_BlitSurface(sol1, NULL, *ecran, &possol1);
  				SDL_BlitSurface(sol2, NULL, *ecran, &possol2);
@@ -236,8 +246,7 @@ void enigme (SDL_Surface **ecran,int **continuer,Mix_Music **intro,Mix_Chunk **e
  				
  				SDL_Delay(4000);
  				boucle=0;
- 				(*menu)=1;
- 				
+
 
             		break;
             		}
@@ -350,7 +359,11 @@ void enigme (SDL_Surface **ecran,int **continuer,Mix_Music **intro,Mix_Chunk **e
 		if (collision(poshero,posplatforme3)==0)
 			{
 			CAR1=0;
-			}    
+			}  
+		if (tempsActuel >=5000)
+		{
+			SDL_BlitSurface(solution, NULL, *ecran, &possolution);
+		}  
        		SDL_BlitSurface(fond, NULL, *ecran, &posfond);
  		SDL_BlitSurface(platforme1, NULL, *ecran, &posplatforme1);
  		SDL_BlitSurface(platforme2, NULL, *ecran, &posplatforme2);
@@ -362,13 +375,5 @@ void enigme (SDL_Surface **ecran,int **continuer,Mix_Music **intro,Mix_Chunk **e
  		SDL_BlitSurface(heroactu,&framed[i/4], *ecran, &poshero);
  		SDL_BlitSurface(gameover,NULL, *ecran, &posgameover);
  		SDL_Flip(*ecran);
-	}
-	if (victory==1)
-	{
-		SDL_FillRect(*ecran, NULL, SDL_MapRGB((*ecran)->format, 0, 0, 0));
-		gameover=TTF_RenderText_Blended(fonts, "THANKS FOR PLAYING THE DEMO", couleur);
-		SDL_BlitSurface(gameover,NULL, *ecran, &posvictory);
-		SDL_Flip(*ecran);
-		SDL_Delay(4000);
 	}
 }

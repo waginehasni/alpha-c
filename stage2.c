@@ -1,323 +1,25 @@
 #include "stage1.h"
+#include "stage2.h"
 #include "option.h"
 #include "sound.h"
 #include "fonction.h"
 #include "enigme.h"
 #define speed  6
-
-void Blit(SDL_Surface* source,SDL_Surface* dest,int x,int y)
-{
-    SDL_Rect R;
-    R.x = x;
-    R.y = y;
-    SDL_BlitSurface(source,NULL,dest,&R);
-}
-//stage0
-void stage0(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,Mix_Chunk *effet2,Mix_Music *musique,int *mute,SDL_Rect *posvolb,Mix_Chunk *sonspell)
-{
-	SDL_Surface *background=NULL,*herod=NULL,*herog=NULL,*heroactu=NULL,*blaka=NULL, *attackr=NULL,*attackl=NULL,*magicien=NULL,*idler=NULL,*idlel=NULL,*bulle=NULL,*baguette=NULL,*troll=NULL,*spell=NULL;
-	SDL_Rect posback,poshero,posmagicien,framed[8],posbulle,bullanim[8],posbaguette,postroll,posspell,posblaka;
-	int boucle=1,i=0,a=0,p=0,posans=460,k=-1,y=0,x=0,j=0,e=2,intspell=0,nbrspell=0,animmage=0;
-	SDL_Event event;
- 	Uint8 *keystates = SDL_GetKeyState( NULL );
- 	postroll.x=35;
- 	postroll.y=460;
- 	posblaka.x=1000;
- 	posblaka.y=410;
- 	
- 	posbaguette.x=160;
- 	posbaguette.y=550;
-	poshero.x=1150;
-	poshero.y=460; 
-	posback.x=0;
-	posback.y=0;
-	posbulle.x=150;
-	posbulle.y=360;
-	posmagicien.x=0; 
-	posmagicien.y=460;
-	blaka=IMG_Load("image/decoration/blaka.png");
-	spell=IMG_Load("image/decoration/spell.png");
-	baguette=IMG_Load("image/magicien/baguette.png");
-	idler=IMG_Load ("image/perso/idlers.png");
-	idlel=IMG_Load ("image/perso/idlels.png");
-	troll=IMG_Load ("image/magicien/troll.png");
-	background=IMG_Load ("image/stage/maison.png");
-	bulle=IMG_Load ("image/magicien/bulle.png");
-	herod=IMG_Load ("image/perso/wr.png"); 
-	herog=IMG_Load ("image/perso/wl.png");
-	attackr=IMG_Load ("image/perso/ar.png");
-	attackl=IMG_Load ("image/perso/al.png");
-	magicien=IMG_Load ("image/magicien/mp.png");
-	SDL_BlitSurface(background, NULL, ecran, &posback);
-
-	for (i=0; i<8;i++)
-	{
-		if (j==4)
-		{
-			x=0;
-			y=y+250;
-			j=0;
-		}
-		framed[ i ].x=x;
-		framed[ i ].y=y;
-    		framed[ i ].w =140;
-    		framed[ i ].h = 250;
-    		x=x+140;
-    		j++;
-	}
-    	x=0;
-    	y=0;
-    	j=0;
-    	for (i=0; i<8;i++)
-	{
-		if (j==4)
-		{
-			x=0;
-			y=y+153;
-			j=0;
-		}
-		bullanim[ i ].x=x;
-		bullanim[ i ].y=y;
-    		bullanim[ i ].w =232;
-    		bullanim[ i ].h = 153;
-    		x=x+232;
-    		j++;
-	}
-    	heroactu=idlel;
-        SDL_BlitSurface(magicien, &framed[0], ecran, &posmagicien);
-	SDL_BlitSurface(heroactu, &framed[0], ecran, &poshero);
-	i=0;
-	for (j=0 ; j<600; j++)
-	{       
-	        animation(&heroactu,idlel,&i);
-	        SDL_BlitSurface(background, NULL, ecran, &posback);
-	        SDL_BlitSurface(magicien, &framed[i/4], ecran, &posmagicien);
-		SDL_BlitSurface(bulle, &bullanim[j/150], ecran, &posbulle);
-		SDL_BlitSurface(heroactu, &framed[i/4], ecran, &poshero);
-		SDL_Flip(ecran);
-		
-	}
-	SDL_Flip(ecran);
-	SDL_EnableKeyRepeat(10,40);
-while ((boucle)&&((*continuer)))
-    	{	
-        	while (SDL_PollEvent(&event))
-       		switch(event.type)
-        	{
-       			case SDL_QUIT:
-            		(*continuer) = 0;
-            		break;
-            		case SDL_VIDEORESIZE:
-				ecran = SDL_SetVideoMode(1920, 1080, 32, SDL_HWSURFACE | SDL_DOUBLEBUF |SDL_RESIZABLE);
-    				break;
-            		case SDL_KEYDOWN:
-            		switch (event.key.keysym.sym)
-            		{	
-            			break;
-				case SDLK_TAB:
-				option(ecran,effet,effet2,musique,mute,continuer,posvolb);
-				break;
-            		}
-			
-            		break;
-		}
-		if(keystates == SDL_GetKeyState(NULL))
-		{
-		if(e==1)
-		animation(&heroactu,idler,&i);
-		if(e==2)
-		animation(&heroactu,idlel,&i);
-		}
-
-		if(keystates[SDLK_k])
-		{
-            			if (a==0)
-            			{	
-            				posans=poshero.y;
-            				a=1;
-            			}
-		}
-		if(keystates[SDLK_d])
-		{
-			        e=1;
-            			animation(&heroactu,herod,&i);
-				poshero.x+=speed;
-		}
-		if(keystates[SDLK_q])
-		{
-            			e=2;           			
-            			animation(&heroactu,herog,&i); 
-            			poshero.x-=speed;
-		}
-		if(keystates[SDLK_j]&&intspell==0)
-		{
-			if(p==1&&poshero.y>=460)
-			{
-				posspell.y=poshero.y+30;
-		        	posspell.x=poshero.x+poshero.h/2;
-		        	if(e==1)
-		        	{
-		        		intspell=1;
-		        		heroactu=attackr;
-		        		Mix_PlayChannel( -1, sonspell, 0 ) ;
-		               	 	while (k<28)
-		                	{
-		               			k++;
-		                		SDL_BlitSurface(background, NULL, ecran, &posback);
-		                		SDL_BlitSurface(blaka,NULL,ecran,&posblaka);
-       	 	                		SDL_BlitSurface(heroactu, &framed[k/4], ecran, &poshero);	
-       	 					SDL_BlitSurface(magicien, &framed[k/4], ecran, &posmagicien);
-       	 	                		SDL_Flip(ecran);
-		                	}
-		                	heroactu=herod;
-		        }
-		       	 	if(e==2)
-		        	{
-					posspell.y=poshero.y+30;
-		        		posspell.x=poshero.x-poshero.h/2;
-
-		        		intspell=2;
-		                	heroactu=attackl;
-		                	Mix_PlayChannel( -1, sonspell, 0 ) ;
-		        	 	while (k<28)
-		                	{
-		                		k++;	
-		                		SDL_BlitSurface(background, NULL, ecran, &posback);
-		                		SDL_BlitSurface(blaka,NULL,ecran,&posblaka);
-       	 	                		SDL_BlitSurface(heroactu, &framed[k/4], ecran, &poshero);
-       	 					SDL_BlitSurface(magicien, &framed[k/4], ecran, &posmagicien);
-       	 	                		SDL_Flip(ecran);
-		               	 	}
-		               	 	heroactu=herog;
-		        	}
-			}
-		}
-		k=-1;
-			animmage++;
-        		if (animmage==32)
-        		{
-            		animmage=0;
-        		}
-		if (a==1)
-		{
-			poshero.y-=9;
-			if (poshero.y<=posans-160)
-			{
-				a=2;
-			}
-		}
-		else if (a==2)
-		{
-			poshero.y+=9;
-			if (poshero.y>=posans)
-			{
-				a=0;
-			}
-		}		
-		
-		if(poshero.x<400 && p==0)
-		{
-			poshero.y=460;
-			for (j=100; j<350; j+=5)
-			{
-				posbaguette.x=j;
-				SDL_BlitSurface(background, NULL, ecran, &posback);
-				animation(&heroactu,idlel,&i); 
-       	 	                SDL_BlitSurface(heroactu, &framed[i/4], ecran, &poshero);
-       	 			SDL_BlitSurface(magicien, &framed[i/4], ecran, &posmagicien);
-       	 			SDL_BlitSurface(baguette,NULL,ecran,&posbaguette);
-       	 	                SDL_Flip(ecran);
-			}
-			herod=IMG_Load ("image/perso/wr1.png");
-	                herog=IMG_Load ("image/perso/wl1.png");
-	                idler=IMG_Load ("image/perso/idler.png");
-	                idlel=IMG_Load ("image/perso/idlel.png");
-	                heroactu=idlel;
-	                SDL_BlitSurface(background, NULL, ecran, &posback);
-       	 	        SDL_BlitSurface(heroactu, &framed[i/4], ecran, &poshero);
-       	 		SDL_BlitSurface(magicien, &framed[i/4], ecran, &posmagicien);
-       	 	        SDL_Flip(ecran);
-			for (j=4 ; j<7; j++)
-			{				
-				SDL_BlitSurface(bulle, &bullanim[j], ecran, &posbulle);
-				SDL_Flip(ecran);
-				SDL_Delay(4000);
-			}
-	                p=1;
-		}
-		
-		
-		if(poshero.x<1100 && poshero.x>1000 && p==1)
-		{
-			boucle=0;
-		}
-		
-		if(poshero.x+poshero.w>=ecran->w-poshero.w/2)
-		{
-			poshero.x-=speed;
-		}
-
-		if(collision(posspell,posmagicien)==1)
-		{
-			SDL_BlitSurface(troll, NULL, ecran, &postroll);
-			SDL_Flip(ecran);
-			SDL_Delay(500);
-			posspell.x=poshero.x;
-		}
-
-        	SDL_FillRect(ecran, NULL, SDL_MapRGB(ecran->format, 0, 0, 0));
-       	 	SDL_BlitSurface(background, NULL, ecran, &posback);
-       	 	if (intspell==1)
-		{
-		SDL_BlitSurface(spell,NULL, ecran, &posspell);
-		posspell.x+=25;
-		nbrspell++;
-		}
-		if (intspell==2)
-		{
-                SDL_BlitSurface(spell,NULL, ecran, &posspell);
-		posspell.x-=25;
-		nbrspell++;
-		}
-		if(nbrspell==28||(collision(posspell,posmagicien)==1))
-		{
-		intspell=0;
-		nbrspell=0;
-		}
-		if(p==1)
-		SDL_BlitSurface(blaka,NULL,ecran,&posblaka);
-       	 	SDL_BlitSurface(heroactu, &framed[i/4], ecran, &poshero);	
-       	 	SDL_BlitSurface(magicien, &framed[animmage/4], ecran, &posmagicien);
-   	    	SDL_Flip(ecran);
-    	}
-    	/*SDL_FreeSurface(herod);
-    	SDL_FreeSurface(herog);
-    	SDL_FreeSurface(heroactu);
-    	SDL_FreeSurface(police);
-    	SDL_FreeSurface(attackr);
-    	SDL_FreeSurface(attackl);
-    	SDL_FreeSurface(magicien);
-    	SDL_FreeSurface(idle);*/
-    	SDL_FreeSurface(background);
-}
-
-
-//stage1
-void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,Mix_Chunk *effet2,Mix_Music *musique,int *mute,SDL_Rect *posvolb,Mix_Chunk *sonspell,Mix_Chunk *dying,Mix_Chunk *hit)
+void stage2(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,Mix_Chunk *effet2,Mix_Music *musique,int *mute,SDL_Rect *posvolb,Mix_Chunk *sonspell,Mix_Chunk *dying,Mix_Chunk *hit)
 {
 	SDL_Surface *health=NULL,*scoreS=NULL,*portal=NULL,*paragstage1=NULL,*magicien=NULL,*noir=NULL,*gameover=NULL,*attackr=NULL,*attackl=NULL,*hurt=NULL,*rock1=NULL,*rock2=NULL,*spell=NULL,*vie=NULL, *trap1=NULL,*background=NULL,*herod=NULL,*herog=NULL,*heroactu=NULL,*hpup=NULL,*police=NULL,*enemie=NULL,*enemied=NULL,*enemieg=NULL,*enemie1=NULL,*enemied1=NULL,*enemieg1=NULL,*score=NULL,*scoreint=NULL,
 	*idlel=NULL,*idler=NULL,*terre1=NULL,*terre2=NULL,*terre3=NULL,*jumpr=NULL,*jumpl=NULL,*surfacesecondes=NULL,*surfaceminutes=NULL
 	,*imgtime=NULL,*enigmestage1=NULL;
 	SDL_Rect posback,poshero,posmagicien,posmagicienactu,posspell,framed[8],frame2[8],pospolice,posportal,posgo,pose1,posscoreS,pose2,pose3,pose4,pose5,pose6,pose7,posenemie1,posenemie2,posenemie3,posenemie4,posenemie5,posenemie6,posenemie7,poshp,posrock1,posvie,posscore,poshpup,posminutes,possecondes,posnoir,
 	posscoreint,postrap1,posterre1,posterre2,posterre3,posterre4,posterre5,posterre6,posterre7,posterre8,posterre9,postime,posenigme1,posparagstage1;
-	int boucle=1,i=0,jump=0,d1=6,e1=1,compteur1=0,hp=4,k=-1,posans,nbrspell=0,intspell=0,cmpsc=0,posactu=460,compteurmage=0;
+	int boucle=1,i=0,jump=0,d1=6,e1=0,compteur1=0,hp=4,k=-1,hert=-1,posans,nbrspell=0,intspell=0,hite1,cmpsc=0,posactu,compteurmage=0;
 	int CAR1=0,CAR2=0,CAR3=0,CAR4=0,CAR5=0,CAR6=0,CAR7=0,CAR8=0,CAR9=0,CAR10=0;
-	int tempsPrecedent = 0, tempsActuel = 0,tsec=59,tmin=2;
+	int tempsPrecedent = 0, tempsActuel = 0,tsec=59,tmin=2,theur=0;
 	int y=0;
 	int x=0;
 	int j=0;
-	int camera=0,victory=2;
-	int directionhero=1;
+	int camera=0,victory=0;
+	int e=1;
 	int coll=0;
 	int enig=0;
 	int souri,mouvemmentsouri=0,scorefinal=0;
@@ -340,14 +42,14 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 	Mix_PlayMusic(stage1, -1);
 	posparagstage1.y=770;
 	posparagstage1.x=0;
-	for (i=0; i<400;i++)
+	/*for (i=0; i<400;i++)
 		{
 			SDL_FillRect(ecran, NULL, SDL_MapRGB(ecran->format, 0, 0, 0));
 			SDL_BlitSurface(paragstage1, NULL, ecran, &posparagstage1);
 			SDL_Flip(ecran);
 			posparagstage1.y-=2;
 		}
-		SDL_Delay(3000);
+		SDL_Delay(3000);*/
 		//position Tous
 	posnoir.x=0;
 	posnoir.y=0;
@@ -481,10 +183,13 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 	pose7.x=7000;
 	pose7.y=460;
 	
+	posspell.x=0;
+	posspell.y=2000;
 	
 	poshero.x=0;
 	poshero.y=460;
-
+	poshero.w=20;
+	poshero.h=20;
 	
 	posback.x=0;
 	posback.y=0;
@@ -514,7 +219,7 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 	enemied1=IMG_Load ("image/enemies/en2wr.png");
 	enemieg1=IMG_Load ("image/enemies/en2wl.png");
 	police=IMG_Load ("image/test.png");
-	background=IMG_Load ("image/stage/map1.png");
+	background=IMG_Load ("image/stage/map2.png");
 	herod=IMG_Load ("image/perso/wr1.png");
 	herog=IMG_Load ("image/perso/wl1.png");
 	magicien=IMG_Load("image/magicien/mp2.png");
@@ -567,6 +272,7 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 	SDL_EnableKeyRepeat(10,70);
 	while ((boucle)&&((*continuer)))
     	{
+    	keystates = SDL_GetKeyState(NULL);
     	sprintf(secondes, "%d",tsec);
     	surfacesecondes= TTF_RenderUTF8_Solid(fonts, secondes, couleur);
     	sprintf(minutes, "%d",tmin);
@@ -606,19 +312,124 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
                         //clavier
 		if(keystates == SDL_GetKeyState(NULL))
 		{
-		        if(directionhero==1)
+		        if(e==1)
 		        animation(&heroactu,idler,&i);
-		        if(directionhero==2)
+		        if(e==2)
 		        animation(&heroactu,idlel,&i);
 		}
-		
+		if(keystates[SDLK_u])
+		{
+			{
+			for(j=0;j<400;j++)
+		        {
+                        	if (compteurmage==24)
+                                {
+                                	compteurmage=0;
+                                }
+		                compteurmage++;
+		        	animation(&heroactu,idler,&i);
+		        	Blit(background,ecran,posback.x,posback.y);
+		        	SDL_BlitSurface(heroactu, &framed[i/4], ecran, &poshero);
+		        	SDL_BlitSurface(magicien, &framed[compteurmage/4], ecran, &posmagicienactu);
+		        	SDL_BlitSurface(enigmestage1, &frame2[j/100], ecran, &posenigme1);
+		        	Blit(terre3,ecran,posterre7.x,posterre7.y);
+		        	Blit(terre3,ecran,posterre8.x,posterre8.y);
+		        	Blit(terre3,ecran,posterre9.x,posterre9.y);
+		        	SDL_Flip(ecran);
+		        }
+			enigme(&ecran, &continuer, &intro, &effet, &effet2, &musique, &mute, &posvolb,&dying,&victory);
+			SDL_FillRect(ecran, NULL, SDL_MapRGB(ecran->format, 0, 0, 0));
+			if (victory==0)
+			{
+				hp=0;
+			}
+			scorefinal =(hp*1000)+ (cmpsc * 100)+ (tmin * 100 ) +tsec;
+			char charscore[4];
+			sprintf(charscore, "%d",scorefinal);
+			fonts = TTF_OpenFont("fonts/Takota.ttf", 90);
+			SDL_Color couleur ={255,255,255};
+			sprintf(chhp, "%d",hp);
+       			vie= TTF_RenderText_Blended(fonts,chhp, couleur);
+			
+			
+    			scoreS= TTF_RenderUTF8_Solid(fonts, charscore, couleur);
+    			vie= TTF_RenderUTF8_Solid(fonts, chhp, couleur);
+			
+			
+			posscoreS.x=800;
+			posscoreS.y=470;
+			
+			posscore.x=500;
+			posscore.y=450;
+			
+			posvie.x=800;
+			posvie.y=250;
+			
+			poshp.x=500;
+			poshp.y=230;
+			
+			poshero.x=150;
+			poshero.y=460;
+			score=IMG_Load ("image/decoration/score1.png");
+			health=IMG_Load("image/health/heart1.png");
+			SDL_BlitSurface(score, NULL, ecran, &posscore);	
+			SDL_BlitSurface(vie, NULL, ecran, &posvie);	
+			SDL_BlitSurface(health, NULL, ecran, &poshp);
+			y=255;
+			for (j=0; j<=scorefinal + 2000; j+=9)
+			{
+				SDL_FillRect(ecran, NULL, SDL_MapRGB(ecran->format, 0, 0, 0));
+				SDL_BlitSurface(portal, NULL, ecran, &posportal);
+				if (poshero.x<=1050)
+				{
+					poshero.x+=4;
+					animation2(&heroactu,herod,&i);
+				}
+				else
+				{	
+					animation2(&heroactu,idler,&i);
+					SDL_SetAlpha (portal, SDL_SRCALPHA, y);
+					if (y!=0)
+					{
+						y-=0.1;
+					}
+				}
+
+				if (j>=scorefinal)
+				{
+					sprintf(charscore, "%d",scorefinal);
+					scoreS= TTF_RenderUTF8_Solid(fonts, charscore, couleur);
+				}
+				else
+				{
+					sprintf(charscore,"%d",j);
+					scoreS= TTF_RenderUTF8_Solid(fonts, charscore, couleur);
+				}
+				SDL_BlitSurface(heroactu, &framed[i/8], ecran, &poshero);
+				SDL_BlitSurface(score, NULL, ecran, &posscore);	
+				SDL_BlitSurface(vie, NULL, ecran, &posvie);	
+				SDL_BlitSurface(health, NULL, ecran, &poshp);
+				SDL_BlitSurface(scoreS, NULL, ecran, &posscoreS);
+				
+				SDL_Flip(ecran);
+			}
+			posscore.x=120;
+			posscore.y=200;
+			SDL_FillRect(ecran, NULL, SDL_MapRGB(ecran->format, 0, 0, 0));
+			score=TTF_RenderText_Blended(fonts, "THANKS FOR PLAYING THE DEMO", couleur);
+			SDL_BlitSurface(score,NULL, ecran, &posscore);
+			SDL_Flip(ecran);
+			SDL_Delay(4000);
+			boucle=0;
+		}
+		}
 		if(keystates[SDLK_k])//jump
 		{
 			if(jump==0||CAR1==1||CAR2==1||CAR3==1||CAR4==1||CAR5==1||CAR6==1||CAR7==1||CAR8==1||CAR9==1||CAR10==1)
 			{
-			                if(directionhero==1)
+			                if(e==1)
 					heroactu=jumpr;
-					if(directionhero==2)
+					if(e==2)
 					heroactu=jumpl;
 				posans=poshero.y;
             			jump=1;
@@ -627,35 +438,39 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 		}
 		if(keystates[SDLK_d])//right
 		{
-			        directionhero=1;
+			        e=1;
             			animation(&heroactu,herod,&i);
             			if (coll==0)
             			{
-            			scrolling(&poshero.x,&posmagicien.x,&posenigme1.x,&poshpup.x,&posback.x,&pospolice.x,&pose1.x,&pose2.x,&pose3.x,&pose4.x,&pose5.x,&pose6.x,&pose7.x,&posrock1.x,&postrap1.x,&posterre3.x,&posterre1.x,&posterre2.x,&posterre4.x,&posterre5.x,&posterre6.x,&posterre7.x,&posterre8.x,&posterre9.x,&camera,&ecran,&heroactu,directionhero);
+            			scrolling2(&poshero.x,&posmagicien.x,&posenigme1.x,&poshpup.x,&posback.x,&pospolice.x,&pose1.x,&pose2.x,&pose3.x,&pose4.x,&pose5.x,&pose6.x,&pose7.x,&posrock1.x,&postrap1.x,&posterre3.x,&posterre1.x,&posterre2.x,&posterre4.x,&posterre5.x,&posterre6.x,&posterre7.x,&posterre8.x,&posterre9.x,&camera,&ecran,&heroactu,e);
             			}
             			else
             			{
+				//	camera+=speed;
             				poshero.x+=speed;
             			}
 					
 		}
 		if(keystates[SDLK_q])//left
 		{
-            			directionhero=2;        			
+            			e=2;        			
             			animation(&heroactu,herog,&i);
             			if (coll==0)
             			{
-            			scrolling(&poshero.x,&posmagicien.x,&posenigme1.x,&poshpup.x,&posback.x,&pospolice.x,&pose1.x,&pose2.x,&pose3.x,&pose4.x,&pose5.x,&pose6.x,&pose7.x,&posrock1.x,&postrap1.x,&posterre3.x,&posterre1.x,&posterre2.x,&posterre4.x,&posterre5.x,&posterre6.x,&posterre7.x,&posterre8.x,&posterre9.x,&camera,&ecran,&heroactu,directionhero);
+            			scrolling2(&poshero.x,&posmagicien.x,&posenigme1.x,&poshpup.x,&posback.x,&pospolice.x,&pose1.x,&pose2.x,&pose3.x,&pose4.x,&pose5.x,&pose6.x,&pose7.x,&posrock1.x,&postrap1.x,&posterre3.x,&posterre1.x,&posterre2.x,&posterre4.x,&posterre5.x,&posterre6.x,&posterre7.x,&posterre8.x,&posterre9.x,&camera,&ecran,&heroactu,e);
             			}
             			else
             			{
+            			       // camera-=speed;
             				poshero.x-=speed;
             			}
 		
 		}
 		if(keystates[SDLK_j]&&intspell==0&&(jump==0||CAR1==1||CAR2==1||CAR3==1||CAR4==1||CAR5==1||CAR6==1||CAR7==1||CAR8==1||CAR9==1||CAR10==1))//attack
 		{
-		        	if(directionhero==1)
+		
+			        
+		        	if(e==1)
 		        	{
 		        	        posspell.x=poshero.x+poshero.h/2;
 		        	        posspell.y=poshero.y+30;
@@ -715,8 +530,9 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
        		                		SDL_BlitSurface(heroactu, &framed[k/4], ecran, &poshero);
        		                		SDL_Flip(ecran);
 		                	}
+		                	heroactu=herod;
 		       		}
-		       		if(directionhero==2)
+		       		if(e==2)
 		        	{
 		        	        intspell=2;
 		                	heroactu=attackl;
@@ -775,6 +591,7 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
        		                		SDL_BlitSurface(heroactu, &framed[k/4], ecran, &poshero);
        		                		SDL_Flip(ecran);
 		               		}
+		               		heroactu=herog;
 		        	}
 		}
 		
@@ -792,16 +609,16 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 			else if(souri>posactu)
 			{
 			posactu+=speed;
-			directionhero=1;
+			e=1;
 			animation(&heroactu,herod,&i); 
-			scrolling(&poshero.x,&posmagicien.x,&posenigme1.x,&poshpup.x,&posback.x,&pospolice.x,&pose1.x,&pose2.x,&pose3.x,&pose4.x,&pose5.x,&pose6.x,&pose7.x,&posrock1.x,&postrap1.x,&posterre3.x,&posterre1.x,&posterre2.x,&posterre4.x,&posterre5.x,&posterre6.x,&posterre7.x,&posterre8.x,&posterre9.x,&camera,&ecran,&heroactu,directionhero);
+			scrolling2(&poshero.x,&posmagicien.x,&posenigme1.x,&poshpup.x,&posback.x,&pospolice.x,&pose1.x,&pose2.x,&pose3.x,&pose4.x,&pose5.x,&pose6.x,&pose7.x,&posrock1.x,&postrap1.x,&posterre3.x,&posterre1.x,&posterre2.x,&posterre4.x,&posterre5.x,&posterre6.x,&posterre7.x,&posterre8.x,&posterre9.x,&camera,&ecran,&heroactu,e);
             			}
 			else if(souri<posactu)
 			{
 			posactu-=speed;
-			directionhero=2;
+			e=2;
 			animation(&heroactu,herog,&i); 
-            		scrolling(&poshero.x,&posmagicien.x,&posenigme1.x,&poshpup.x,&posback.x,&pospolice.x,&pose1.x,&pose2.x,&pose3.x,&pose4.x,&pose5.x,&pose6.x,&pose7.x,&posrock1.x,&postrap1.x,&posterre3.x,&posterre1.x,&posterre2.x,&posterre4.x,&posterre5.x,&posterre6.x,&posterre7.x,&posterre8.x,&posterre9.x,&camera,&ecran,&heroactu,directionhero);
+            		scrolling2(&poshero.x,&posmagicien.x,&posenigme1.x,&poshpup.x,&posback.x,&pospolice.x,&pose1.x,&pose2.x,&pose3.x,&pose4.x,&pose5.x,&pose6.x,&pose7.x,&posrock1.x,&postrap1.x,&posterre3.x,&posterre1.x,&posterre2.x,&posterre4.x,&posterre5.x,&posterre6.x,&posterre7.x,&posterre8.x,&posterre9.x,&camera,&ecran,&heroactu,e);
             			}
 
 
@@ -833,9 +650,9 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 		if (jump==1)
 		{
 			poshero.y-=9;
-			if(directionhero==1)
+			if(e==1)
 			animation(&heroactu,jumpr,&i);
-			if(directionhero==2)
+			if(e==2)
 			animation(&heroactu,jumpl,&i);
 			if (poshero.y<=posans-200)
 			{
@@ -844,9 +661,9 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 		}
 		else if (jump==2&&CAR1==0&&CAR2==0&&CAR3==0&&CAR4==0&&CAR5==0&&CAR6==0&&CAR7==0&&CAR8==0&&CAR9==0&&CAR10==0)
 		{
-		        if(directionhero==1)	        
+		        if(e==1)	        
 		        animation(&heroactu,jumpr,&i);
-		        if(directionhero==2)
+		        if(e==2)
 		        animation(&heroactu,jumpl,&i);
 			poshero.y+=9;
 				if (poshero.y>=460)
@@ -865,9 +682,9 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 		{
 			animation(&enemie,enemieg,&e1);
 			animation(&enemie1,enemieg1,&e1);
-		}
-		posenemie1.x=pose1.x+compteur1*speed;					
+		}					
 		posenemie2.x=pose2.x+compteur1*speed;
+		posenemie1.x=pose1.x+compteur1*speed;
 		posenemie3.x=pose3.x+compteur1*speed;
 		posenemie4.x=pose4.x+compteur1*speed;
                 posenemie5.x=pose5.x+compteur1*speed;
@@ -892,14 +709,14 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 			mouvemmentsouri=0;
 			}
 			//collision avec rock1
-		if (collision(poshero,posrock1)==1 && (directionhero==1) && jump==0) 
+		if (collision(poshero,posrock1)==1 && (e==1) && jump==0) 
 			{ 
 			poshero.x-=speed;
 			camera-=speed;
 			coll=1;
 			mouvemmentsouri=0;
 			}
-		if (collision(poshero,posrock1)==1 && (directionhero==2) && jump==0)
+		if (collision(poshero,posrock1)==1 && (e==2) && jump==0)
 			{ 
 			mouvemmentsouri=0;
 			poshero.x+=speed;
@@ -908,21 +725,28 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 			}
 		if (collision(poshero,posrock1)==1 && jump==2)
 			{
+
 			CAR1=1;
 			} 
 		if (collision(poshero,posrock1)==0)
 			{
 			CAR1=0;
 			}
-
 		if (collision(poshero,posrock1)==1 && (jump==2||jump==1)&& (poshero.y+poshero.h>posrock1.y+6))
 			{
-                                if(directionhero==1)
+                                if(e==1)
+                                poshero.x-=speed;
+                                if(e==2)
+                                poshero.x+=speed;
+			} 
+		if (collision(poshero,posrock1)==1 && (jump==2||jump==1)&& (poshero.y+poshero.h>posrock1.y+6))
+			{
+                                if(e==1)
                                 {
                                 poshero.x-=speed;
                                 camera-=speed;
                                 }
-                                if(directionhero==2)
+                                if(e==2)
                                 {
                                 poshero.x+=speed;
                                 camera+=speed;
@@ -932,14 +756,14 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 			} 
 		
 			//collision avec terre1
-		if (collision(poshero,posterre1)==1 && directionhero==1 && jump==0) 
+		if (collision(poshero,posterre1)==1 && e==1 && jump==0) 
 			{ 
 			poshero.x-=speed;
 			camera-=speed;
 			coll=1;
 			mouvemmentsouri=0;
 			}
-		if (collision(poshero,posterre1)==1 && directionhero==2 && jump==0) 
+		if (collision(poshero,posterre1)==1 && e==2 && jump==0) 
 			{ 
 			poshero.x+=speed;
 			camera+=speed;
@@ -958,12 +782,12 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 			}
 		if (collision(poshero,posterre1)==1 && (jump==2||jump==1)&& (poshero.y+poshero.h>posterre1.y+speed))
 			{
-                                if(directionhero==1)
+                                if(e==1)
                                 {
                                 poshero.x-=speed;
                                 camera-=speed;
                                 }
-                                if(directionhero==2)
+                                if(e==2)
                                 {
                                 poshero.x+=speed;
                                 camera+=speed;
@@ -972,14 +796,14 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
                                 poshero.y+=speed;
 			} 
 			//collision avec terre2
-		if (collision(poshero,posterre2)==1 && directionhero==1 && jump==0) 
+		if (collision(poshero,posterre2)==1 && e==1 && jump==0) 
 			{ 
 			poshero.x-=speed;
 			camera-=speed;
 			coll=1;
 			mouvemmentsouri=0;
 			}
-		if (collision(poshero,posterre2)==1 && directionhero==2 && jump==0) 
+		if (collision(poshero,posterre2)==1 && e==2 && jump==0) 
 			{ 
 			poshero.x+=speed;
 			camera+=speed;
@@ -998,12 +822,12 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 			}
 	        if (collision(poshero,posterre2)==1 && (jump==2||jump==1)&& (poshero.y+poshero.h>posterre2.y+speed))
 			{
-                                if(directionhero==1)
+                                if(e==1)
                                 {
                                 poshero.x-=speed;
                                 camera-=speed;
                                 }
-                                if(directionhero==2)
+                                if(e==2)
                                 {
                                 poshero.x+=speed;
                                 camera+=speed;
@@ -1012,14 +836,14 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
                                 poshero.y+=speed;
 			} 
 			//collision avec terre3
-		if (collision(poshero,posterre3)==1 && directionhero==1 && jump==0) 
+		if (collision(poshero,posterre3)==1 && e==1 && jump==0) 
 			{ 
 			poshero.x-=speed;
 			camera-=speed;
 			coll=1;
 			mouvemmentsouri=0;
 			}
-		if (collision(poshero,posterre3)==1 && directionhero==2 && jump==0) 
+		if (collision(poshero,posterre3)==1 && e==2 && jump==0) 
 			{ 
 			poshero.x+=speed;
 			camera+=speed;
@@ -1038,12 +862,12 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 			}
 		if (collision(poshero,posterre3)==1 && (jump==2||jump==1)&& (poshero.y+poshero.h>posterre3.y+speed))
 			{
-                                 if(directionhero==1)
+                                 if(e==1)
                                 {
                                 poshero.x-=speed;
                                 camera-=speed;
                                 }
-                                if(directionhero==2)
+                                if(e==2)
                                 {
                                 poshero.x+=speed;
                                 camera+=speed;
@@ -1052,14 +876,14 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
                                 poshero.y+=speed;
 			}
 		//collision avec terre4
-		if (collision(poshero,posterre4)==1 && directionhero==1 && jump==0) 
+		if (collision(poshero,posterre4)==1 && e==1 && jump==0) 
 			{ 
 			poshero.x-=speed;
 			camera-=speed;
 			coll=1;
 			mouvemmentsouri=0;
 			}
-		if (collision(poshero,posterre4)==1 && directionhero==2 && jump==0) 
+		if (collision(poshero,posterre4)==1 && e==2 && jump==0) 
 			{ 
 			poshero.x+=speed;
 			camera+=speed;
@@ -1078,12 +902,12 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 			}
 	        if (collision(poshero,posterre4)==1 && (jump==2||jump==1)&& (poshero.y+poshero.h>posterre4.y+speed))
 			{
-                                if(directionhero==1)
+                                if(e==1)
                                 {
                                 poshero.x-=speed;
                                 camera-=speed;
                                 }
-                                if(directionhero==2)
+                                if(e==2)
                                 {
                                 poshero.x+=speed;
                                 camera+=speed;
@@ -1092,14 +916,14 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
                                 poshero.y+=speed;
 			}
 		//collision avec terre5
-		if (collision(poshero,posterre5)==1 && directionhero==1 && jump==0) 
+		if (collision(poshero,posterre5)==1 && e==1 && jump==0) 
 			{ 
 			poshero.x-=speed;
 			camera-=speed;
 			coll=1;
 			mouvemmentsouri=0;
 			}
-		if (collision(poshero,posterre5)==1 && directionhero==2 && jump==0) 
+		if (collision(poshero,posterre5)==1 && e==2 && jump==0) 
 			{ 
 			poshero.x+=speed;
 			camera+=speed;
@@ -1118,12 +942,12 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 			}
 	        if (collision(poshero,posterre5)==1 && (jump==2||jump==1)&& (poshero.y+poshero.h>posterre5.y+speed))
 			{
-                                if(directionhero==1)
+                                if(e==1)
                                 {
                                 poshero.x-=speed;
                                 camera-=speed;
                                 }
-                                if(directionhero==2)
+                                if(e==2)
                                 {
                                 poshero.x+=speed;
                                 camera+=speed;
@@ -1132,14 +956,14 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
                                 poshero.y+=speed;
 			}
 		//collision avec terre6
-		if (collision(poshero,posterre6)==1 && directionhero==1 && jump==0) 
+		if (collision(poshero,posterre6)==1 && e==1 && jump==0) 
 			{ 
 			poshero.x-=speed;
 			camera-=speed;
 			coll=1;
 			mouvemmentsouri=0;
 			}
-		if (collision(poshero,posterre6)==1 && directionhero==2 && jump==0) 
+		if (collision(poshero,posterre6)==1 && e==2 && jump==0) 
 			{ 
 			poshero.x+=speed;
 			camera+=speed;
@@ -1158,12 +982,12 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 			}
 	        if (collision(poshero,posterre6)==1 && (jump==2||jump==1)&& (poshero.y+poshero.h>posterre6.y+speed))
 			{
-                                if(directionhero==1)
+                                if(e==1)
                                 {
                                 poshero.x-=speed;
                                 camera-=speed;
                                 }
-                                if(directionhero==2)
+                                if(e==2)
                                 {
                                 poshero.x+=speed;
                                 camera+=speed;
@@ -1172,14 +996,14 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
                                 poshero.y+=speed;
 			}
 		//collision avec terre7
-		if (collision(poshero,posterre7)==1 && directionhero==1 && jump==0) 
+		if (collision(poshero,posterre7)==1 && e==1 && jump==0) 
 			{ 
 			poshero.x-=speed;
 			camera-=speed;
 			coll=1;
 			mouvemmentsouri=0;
 			}
-		if (collision(poshero,posterre7)==1 && directionhero==2 && jump==0) 
+		if (collision(poshero,posterre7)==1 && e==2 && jump==0) 
 			{ 
 			poshero.x+=speed;
 			camera+=speed;
@@ -1198,12 +1022,12 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 			}
 	        if (collision(poshero,posterre7)==1 && (jump==2||jump==1)&& (poshero.y+poshero.h>posterre7.y+speed))
 			{
-                                if(directionhero==1)
+                                if(e==1)
                                 {
                                 poshero.x-=speed;
                                 camera-=speed;
                                 }
-                                if(directionhero==2)
+                                if(e==2)
                                 {
                                 poshero.x+=speed;
                                 camera+=speed;
@@ -1212,14 +1036,14 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
                                 poshero.y+=speed;
 			}
 		//collision avec terre8
-		if (collision(poshero,posterre8)==1 && directionhero==1 && jump==0) 
+		if (collision(poshero,posterre8)==1 && e==1 && jump==0) 
 			{ 
 			poshero.x-=speed;
 			camera-=speed;
 			coll=1;
 			mouvemmentsouri=0;
 			}
-		if (collision(poshero,posterre8)==1 && directionhero==2 && jump==0) 
+		if (collision(poshero,posterre8)==1 && e==2 && jump==0) 
 			{ 
 			poshero.x+=speed;
 			camera+=speed;
@@ -1238,12 +1062,12 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 			}
 	        if (collision(poshero,posterre8)==1 && (jump==2||jump==1)&& (poshero.y+poshero.h>posterre8.y+speed))
 			{
-                                if(directionhero==1)
+                                if(e==1)
                                 {
                                 poshero.x-=speed;
                                 camera-=speed;
                                 }
-                                if(directionhero==2)
+                                if(e==2)
                                 {
                                 poshero.x+=speed;
                                 camera+=speed;
@@ -1252,14 +1076,14 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
                                 poshero.y+=speed;
 			}
 		//collision avec terre9
-		if (collision(poshero,posterre9)==1 && directionhero==1 && jump==0) 
+		if (collision(poshero,posterre9)==1 && e==1 && jump==0) 
 			{ 
 			poshero.x-=speed;
 			camera-=speed;
 			coll=1;
 			mouvemmentsouri=0;
 			}
-		if (collision(poshero,posterre9)==1 && directionhero==2 && jump==0) 
+		if (collision(poshero,posterre9)==1 && e==2 && jump==0) 
 			{ 
 			poshero.x+=speed;
 			camera+=speed;
@@ -1278,12 +1102,12 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 			}
 	        if (collision(poshero,posterre9)==1 && (jump==2||jump==1)&& (poshero.y+poshero.h>posterre9.y+speed))
 			{
-                                if(directionhero==1)
+                                if(e==1)
                                 {
                                 poshero.x-=speed;
                                 camera-=speed;
                                 }
-                                if(directionhero==2)
+                                if(e==2)
                                 {
                                 poshero.x+=speed;
                                 camera+=speed;
@@ -1292,7 +1116,7 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
                                 poshero.y+=speed;
 			}				 
 			//collision avec trap1
-		if(collision(poshero,postrap1)==1&&directionhero==1)
+		if(collision(poshero,postrap1)==1&&e==1)
 		{
 		     mouvemmentsouri=0;
 		     coll=1;
@@ -1303,7 +1127,7 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 		     if(hp!=0)
 		     hp--;
 		}
-		if(collision(poshero,postrap1)==1&&directionhero==2)
+		if(collision(poshero,postrap1)==1&&e==2)
 		{
 		     mouvemmentsouri=0;
 		     coll=1;
@@ -1372,7 +1196,7 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 		posenemie7.y=2000;
 		}
 		//début enigme
-		if (poshero.x + poshero.w < posmagicien.x && poshero.x + poshero.w > posmagicien.x-300 && enig==0 )
+		/*if (poshero.x + poshero.w < posmagicien.x && poshero.x + poshero.w > posmagicien.x-300 && enig==0 )
 		{
 			for(j=0;j<400;j++)
 		        {
@@ -1393,65 +1217,10 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 		        }
 			enigme(&ecran, &continuer, &intro, &effet, &effet2, &musique, &mute, &posvolb,&dying,&victory);
 			SDL_FillRect(ecran, NULL, SDL_MapRGB(ecran->format, 0, 0, 0));
-			boucle=0;
-		}
-		
-		//hpup
-		if(collision(poshero,poshpup)==1)
-		{
-			if(hp!=4)
+			if (victory==0)
 			{
-			hp++;
-			poshpup.y=2000;
+				hp=0;
 			}
-		}
-		
-		//dying
-			if (hp==0 || victory!=2)
-            		{
-			if(hp==0)
-	                {
-            		Mix_PlayChannel( -1, dying, 0 ) ;
-            			heroactu=hurt;
-            			for (j=0; j<43; j++)
-            			{
-            			        Blit(noir,ecran,posnoir.x,posnoir.y);
-            				Blit(rock1,ecran,posrock1.x,posrock1.y);
-		                        Blit(hpup,ecran,poshpup.x,poshpup.y);
-		                        Blit(terre1,ecran,posterre1.x,posterre1.y);
-		                        Blit(terre1,ecran,posterre2.x,posterre2.y);
-		                        Blit(terre1,ecran,posterre3.x,posterre3.y);
-		                        Blit(terre2,ecran,posterre4.x,posterre4.y);
-		                        Blit(terre2,ecran,posterre5.x,posterre5.y);
-		                        Blit(terre2,ecran,posterre6.x,posterre6.y);
-		                        Blit(terre3,ecran,posterre7.x,posterre7.y);
-		                        Blit(terre3,ecran,posterre8.x,posterre8.y);
-		                        Blit(terre3,ecran,posterre9.x,posterre9.y);
-		                        Blit(trap1,ecran,postrap1.x,postrap1.y);
-		                        SDL_BlitSurface(enemie, &framed[j/6], ecran, &posenemie1);
-		                        SDL_BlitSurface(enemie, &framed[j/6], ecran, &posenemie2);
-		                        SDL_BlitSurface(enemie, &framed[j/6], ecran, &posenemie3);
-		                        SDL_BlitSurface(enemie, &framed[j/6], ecran, &posenemie4);
-		                        SDL_BlitSurface(enemie, &framed[j/6], ecran, &posenemie5);
-		                        SDL_BlitSurface(enemie, &framed[j/6], ecran, &posenemie6);
-		                        SDL_BlitSurface(enemie, &framed[j/6], ecran, &posenemie7);
-       		                        SDL_BlitSurface(heroactu, &frame2[j/6], ecran, &poshero);
-       		                        SDL_BlitSurface(vie, NULL, ecran, &posvie);
-       		                        SDL_BlitSurface(imgtime, NULL, ecran, &postime);	
-		                        SDL_BlitSurface(health, NULL, ecran, &poshp);
-		                        SDL_BlitSurface(score, NULL, ecran, &posscore);	
-		                        SDL_BlitSurface(scoreint, NULL, ecran, &posscoreint);		
-   	    	                        SDL_Flip(ecran);
-            			}
-            			gameover=TTF_RenderText_Blended(fonts, "GAME OVER", couleur1);
-            			Blit(noir,ecran,posnoir.x,posnoir.y);
-            			SDL_BlitSurface(heroactu, &frame2[7], ecran, &poshero);
- 				Blit(gameover,ecran,posgo.x,posgo.y);
- 				SDL_Flip(ecran);
-				SDL_Delay(4000);
-			}
-			if(victory==0)
-			hp=0;
 			scorefinal =(hp*1000)+ (cmpsc * 100)+ (tmin * 100 ) +tsec;
 			char charscore[4];
 			sprintf(charscore, "%d",scorefinal);
@@ -1519,9 +1288,9 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 				SDL_BlitSurface(vie, NULL, ecran, &posvie);	
 				SDL_BlitSurface(health, NULL, ecran, &poshp);
 				SDL_BlitSurface(scoreS, NULL, ecran, &posscoreS);
+				
 				SDL_Flip(ecran);
 			}
-			SDL_Delay(4000);
 			posscore.x=120;
 			posscore.y=200;
 			SDL_FillRect(ecran, NULL, SDL_MapRGB(ecran->format, 0, 0, 0));
@@ -1530,6 +1299,61 @@ void stage1(SDL_Surface *ecran,int *continuer,Mix_Music *intro,Mix_Chunk *effet,
 			SDL_Flip(ecran);
 			SDL_Delay(4000);
 			boucle=0;
+		}*/
+		
+		//hpup
+		if(collision(poshero,poshpup)==1)
+		{
+			if(hp!=4)
+			{
+			hp++;
+			poshpup.y=2000;
+			}
+		}
+		
+		//dying
+			if (hp==0 && victory!=0)
+            		{
+            		Mix_PlayChannel( -1, dying, 0 ) ;
+            			heroactu=hurt;
+            			for (j=0; j<43; j++)
+            			{
+            			        Blit(noir,ecran,posnoir.x,posnoir.y);
+            				Blit(rock1,ecran,posrock1.x,posrock1.y);
+		                        Blit(hpup,ecran,poshpup.x,poshpup.y);
+		                        Blit(terre1,ecran,posterre1.x,posterre1.y);
+		                        Blit(terre1,ecran,posterre2.x,posterre2.y);
+		                        Blit(terre1,ecran,posterre3.x,posterre3.y);
+		                        Blit(terre2,ecran,posterre4.x,posterre4.y);
+		                        Blit(terre2,ecran,posterre5.x,posterre5.y);
+		                        Blit(terre2,ecran,posterre6.x,posterre6.y);
+		                        Blit(terre3,ecran,posterre7.x,posterre7.y);
+		                        Blit(terre3,ecran,posterre8.x,posterre8.y);
+		                        Blit(terre3,ecran,posterre9.x,posterre9.y);
+		                        Blit(trap1,ecran,postrap1.x,postrap1.y);
+		                        SDL_BlitSurface(enemie, &framed[j/6], ecran, &posenemie1);
+		                        SDL_BlitSurface(enemie, &framed[j/6], ecran, &posenemie2);
+		                        SDL_BlitSurface(enemie, &framed[j/6], ecran, &posenemie3);
+		                        SDL_BlitSurface(enemie, &framed[j/6], ecran, &posenemie4);
+		                        SDL_BlitSurface(enemie, &framed[j/6], ecran, &posenemie5);
+		                        SDL_BlitSurface(enemie, &framed[j/6], ecran, &posenemie6);
+		                        SDL_BlitSurface(enemie, &framed[j/6], ecran, &posenemie7);
+       		                        SDL_BlitSurface(heroactu, &frame2[j/6], ecran, &poshero);
+       		                        SDL_BlitSurface(vie, NULL, ecran, &posvie);
+       		                        SDL_BlitSurface(imgtime, NULL, ecran, &postime);	
+		                        SDL_BlitSurface(health, NULL, ecran, &poshp);
+		                        SDL_BlitSurface(score, NULL, ecran, &posscore);	
+		                        SDL_BlitSurface(scoreint, NULL, ecran, &posscoreint);		
+   	    	                        SDL_Flip(ecran);
+            			}
+            			gameover=TTF_RenderText_Blended(fonts, "GAME OVER", couleur1);
+            			Blit(noir,ecran,posnoir.x,posnoir.y);
+            			SDL_BlitSurface(heroactu, &frame2[7], ecran, &poshero);
+ 				Blit(gameover,ecran,posgo.x,posgo.y);
+ 				SDL_Flip(ecran);
+ 				SDL_Delay(4000);
+ 				boucle=0;
+            			
             		}
 
 

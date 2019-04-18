@@ -34,6 +34,9 @@ remplirlesposition(&positionFond,&posquit,&posmulti,&posoption,&posplay,&posstar
             case SDL_QUIT:
                 continuer = 0;
                 break;
+             case SDL_KEYDOWN:
+               buttons1(ecran,event,effet,effet2,&continuer,musique,&mute,&posvolb,musiquetuto,sonspell,dying,hit);
+                
             case SDL_MOUSEBUTTONUP:
 
                buttons(ecran,event,effet,effet2,&continuer,musique,&mute,&posvolb,musiquetuto,sonspell,dying,hit);
@@ -42,7 +45,8 @@ remplirlesposition(&positionFond,&posquit,&posmulti,&posoption,&posplay,&posstar
 
             case SDL_MOUSEMOTION:
             affichagetextmenu(&police,&police1,couleur,couleur2,event,&texteplay,&textemulti,&texteoption,&textequit,&commentaireplay,&commentaireoption,&commentairemulti,&commentairequit,effet,&son,&mute);
-                break;          		
+                break;
+		        		
 }
 
 if(continuer)

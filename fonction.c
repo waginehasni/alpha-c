@@ -4,7 +4,116 @@
 #include "sound.h"
 #include "debut.h"
 #include "stage1.h"
+#include "stage2.h"
 #define speed 6
+void scrolling2 (Sint16 *poshero,Sint16 *posmagicien,Sint16 *posenigme1,Sint16 *poshpup,Sint16 *posback,Sint16 *pospolice,Sint16 *pose1,Sint16 *pose2,Sint16 *pose3 ,Sint16 *pose4 ,Sint16 *pose5 ,Sint16 *pose6 ,Sint16 *pose7 ,Sint16 *posrock1,Sint16 *postrap1,Sint16 *posterre3,Sint16 *posterre1, Sint16 *posterre2, Sint16 *posterre4, Sint16 *posterre5, Sint16 *posterre6, Sint16 *posterre7, Sint16 *posterre8, Sint16 *posterre9, int *camera,SDL_Surface **ecran, SDL_Surface **heroactu, int e)
+{
+if (e==1)
+{
+	(*camera)+=speed;
+	(*poshero)+=speed;
+	if((*poshero)>=1366/3 && (*camera)<1366*7-550) //fixe personnage, deplacement decor
+	{
+		(*posenigme1)-=speed;
+		(*postrap1)-=speed;
+		(*posterre1)-=speed;
+		(*posterre2)-=speed;
+		(*posterre3)-=speed;
+		(*posterre4)-=speed;
+		(*posterre5)-=speed;
+		(*posterre6)-=speed;
+		(*posterre7)-=speed;
+		(*posterre8)-=speed;
+		(*posterre9)-=speed;
+		(*poshpup)-=speed;
+		(*posmagicien)-=speed;
+		(*posrock1)-=speed;
+		(*poshero)-=speed;
+		(*posback)-=speed;
+		(*pospolice)-=speed;
+		(*pose1)-=speed;
+		(*pose2)-=speed;
+		(*pose3)-=speed;
+		(*pose4)-=speed;
+		(*pose5)-=speed;
+		(*pose6)-=speed;
+		(*pose7)-=speed;
+	}
+	if((*poshero)>=((1366/4)*3 +150)) //collision ecran droite
+	{
+		(*poshero)-=speed;
+		(*camera)-=speed;
+	}
+}
+else if (e==2)
+{
+	(*camera)-=speed;
+	(*poshero)-=speed;
+	if((*poshero)<=(*ecran)->w/5)
+	{
+		(*posenigme1)+=speed;
+		(*posterre1)+=speed;
+		(*posterre2)+=speed;
+		(*posterre3)+=speed;
+		(*posterre4)+=speed;
+		(*posterre5)+=speed;
+		(*posterre6)+=speed;
+		(*posterre7)+=speed;
+		(*posterre8)+=speed;
+		(*posterre9)+=speed;
+		(*posmagicien)+=speed;
+		(*poshpup)+=speed;
+		(*postrap1)+=speed;
+		(*posrock1)+=speed;
+		(*pose1)+=speed;
+		(*pose2)+=speed;
+		(*pose3)+=speed;
+		(*pose4)+=speed;
+		(*pose5)+=speed;
+		(*pose6)+=speed;
+		(*pose7)+=speed;
+		(*posback)+=speed;
+		(*pospolice)+=speed;
+		(*poshero)+=speed;
+		if((*camera)<0)
+		{
+			(*poshero)+=speed;
+			(*camera)+=speed;
+		}
+	}
+	if ((*posback)>0)
+	{	
+		(*posenigme1)=6700;
+		(*posterre1)=1300;
+		(*posterre2)=1800;
+		(*posterre3)=2300;
+		(*posterre4)=3300;
+		(*posterre5)=3800;
+		(*posterre6)=4300;
+		(*posterre7)=5300;
+		(*posterre8)=5800;
+		(*posterre9)=6300;
+		(*posmagicien)=7500;
+		(*poshpup)=2360;
+		(*postrap1)=2800;
+		(*posrock1)=500;
+		(*pospolice)=800;
+		(*pose1)=1000;
+		(*pose2)=2000;
+		(*pose3)=3000;
+		(*pose4)=4000;
+		(*pose5)=5000;
+		(*pose6)=6000;
+		(*pose7)=7000;
+		(*posback)=0;
+		(*poshero)-=speed;
+		if ((*poshero)<0)
+		{
+			(*poshero)+=speed;
+		}
+	}
+}
+}
 void scrolling (Sint16 *poshero,Sint16 *posmagicien,Sint16 *posenigme1,Sint16 *poshpup,Sint16 *posback,Sint16 *pospolice,Sint16 *pose1,Sint16 *pose2,Sint16 *pose3 ,Sint16 *pose4 ,Sint16 *pose5 ,Sint16 *pose6 ,Sint16 *pose7 ,Sint16 *posrock1,Sint16 *postrap1,Sint16 *posterre3,Sint16 *posterre1, Sint16 *posterre2, Sint16 *posterre4, Sint16 *posterre5, Sint16 *posterre6, Sint16 *posterre7, Sint16 *posterre8, Sint16 *posterre9, int *camera,SDL_Surface **ecran, SDL_Surface **heroactu, int e)
 {
 if (e==1)
@@ -123,6 +232,16 @@ void animation ( SDL_Surface **a, SDL_Surface *b, int *i)
         (*a)=b;
 }
 
+void animation2 ( SDL_Surface **a, SDL_Surface *b, int *i)
+{
+	(*i)++;
+        if ((*i)==64)
+        {
+            (*i)=0;
+        }
+        (*a)=b;
+}
+
 int collision(SDL_Rect hero,SDL_Rect autre)
 {
    if((autre.x <= hero.x + hero.w)&& (autre.x + autre.w >= hero.x)&& (autre.y <= hero.y + hero.h)&& (autre.y +autre.h>= hero.y))
@@ -130,6 +249,15 @@ int collision(SDL_Rect hero,SDL_Rect autre)
    else
           return 0; 
 }
+int Collision(int x,int y,SDL_Rect C)
+{
+   int d2 = (x-C.x)*(x-C.x) + (y-C.y)*(y-C.y);
+   if (d2>C.w/2*C.w/2)
+      return 0;
+   else
+      return 1;
+}
+
 SDL_Color GetPixel(SDL_Surface *surface,int x,int y)
 {
 	SDL_Color color ;
@@ -320,29 +448,15 @@ if (event.motion.x<250  && event.motion.x>120 && event.motion.y<290 && event.mot
 }
 void buttons(SDL_Surface *ecran,SDL_Event event,Mix_Chunk *effet,Mix_Chunk *effet2,int *continuer,Mix_Music *musique,int *mute,SDL_Rect *posvolb,Mix_Music *intro,Mix_Chunk *sonspell,Mix_Chunk *dying,Mix_Chunk *hit)
 {
-		while (SDL_PollEvent(&event))
-		switch(event.type)
-		{
-            	/*case SDL_KEYDOWN:
-                switch (event.key.keysym.sym)
-                {
-			case SDLK_KP1:
-			stage0(ecran,continuer,intro,effet,effet2,musique,mute,posvolb);
-			stage1(ecran,continuer,intro,effet,effet2,musique,mute,posvolb);
-			break;
-			case SDLK_KP3:
-			option(ecran,effet,effet2,musique,mute,continuer,posvolb);
-			break;
-			case SDLK_KP4:
-			continuer=0;
-			break;
-                }*/ 
-                }
+	
 if (event.button.button == SDL_BUTTON_LEFT && event.motion.x<250  && event.motion.x>120 && event.motion.y<290 && event.motion.y>200)
 		{
-			//debut(ecran);
-			//stage0(ecran,continuer,intro,effet,effet2,musique,mute,posvolb,sonspell);
+			debut(ecran);
+			stage0(ecran,continuer,intro,effet,effet2,musique,mute,posvolb,sonspell);
+			if (*continuer==1)
 			stage1(ecran,continuer,intro,effet,effet2,musique,mute,posvolb,sonspell,dying,hit);
+			/*if (*continuer==1)
+			stage2(ecran,continuer,intro,effet,effet2,musique,mute,posvolb,sonspell,dying,hit);*/
 		}
 if (event.button.button == SDL_BUTTON_LEFT && event.motion.x<315  && event.motion.x>120 && event.motion.y<520 && event.motion.y>450)
                 {
@@ -360,6 +474,28 @@ if (event.button.button == SDL_BUTTON_LEFT && event.motion.x<315  && event.motio
            		}
                     (*continuer) = 0;
                 }
+}
+void buttons1(SDL_Surface *ecran,SDL_Event event,Mix_Chunk *effet,Mix_Chunk *effet2,int *continuer,Mix_Music *musique,int *mute,SDL_Rect *posvolb,Mix_Music *intro,Mix_Chunk *sonspell,Mix_Chunk *dying,Mix_Chunk *hit)
+{
+		
+                switch (event.key.keysym.sym)
+                {
+			case SDLK_KP1:
+			debut(ecran);
+			stage0(ecran,continuer,intro,effet,effet2,musique,mute,posvolb,sonspell);
+			if (*continuer==1)
+			stage1(ecran,continuer,intro,effet,effet2,musique,mute,posvolb,sonspell,dying,hit);
+			/*if (*continuer==1)
+			stage2(ecran,continuer,intro,effet,effet2,musique,mute,posvolb,sonspell,dying,hit);*/
+			break;
+			case SDLK_KP3:
+			option(ecran,effet,effet2,musique,mute,continuer,posvolb);
+			break;
+			case SDLK_KP4:
+			(*continuer)=0;
+			break;
+                }
+               
 }
 void positionenemie(int *i,int *k)
 {       if((*k)==2)
